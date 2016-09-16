@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="./styles.css">
+	<script type="text/javascript" src="moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+</head>
+<body>
+
+	<div id="hero">
+	<pre>
+	<p style="background:rgb(250,250,250);">
+		Básicamente se haria lo siguiente: 
+		1.- Un usuario sube un video en algun formato, mp4, mkv, etc.
+		2.- El servidor cuando recibe el video lo codifica al estandar vp9 (.webm) que reduce 
+		significativamente su tamaño sin perdidas de calidad (ACTUALIZACION: Tuve que descartar la codificacion a vp9 ya que solo google la soporta, probare suerte con h265).
+		3.- Una vez que el servidor termina de procesar el video, crea un .torrent de dicho video y 
+		actualiza la base de datos para que el frontend lo carge y el usuario lo pueda ver.
+		4.- Ya en el navegador mediante WebRTC se aprovecha la red P2P para repartir el video entre 
+		las personas que lo estan viendo, mientras mas personas hayan, la transmisión sera mucho más veloz.
+		5- Se puede probar abriendo multiples ventanas y ver como se reparte el ancho de banda	
+		Por el momento tengo problemas con la codificación del video ya que es algo lenta y creo que conviene
+		usar servicios de Cloud Video encoding, claro que la desventaja seria que hay que pagar.
+	</p>
+	</pre>	
+	
+  <div id="output">
+    <div id="progressBar"></div>
+  </div>
+  <div id="status">
+    <div>
+      <span class="show-leech">Descargando </span>
+      <span class="show-seed">Seeding </span>
+      <code>
+        <a id="torrentLink" href="https://elearningp2p.ml/torrents/timedrift-4k-h264.torrent">time-drift-4k-h264.torrent</a>
+      </code>
+      <span class="show-leech"> from </span>
+      <span class="show-seed"> to </span>
+      <code id="numPeers">0 peers</code>. 
+    </div>
+    <div>
+      <code id="downloaded"></code>
+      of <code id="total"></code>
+      	— <span id="remaining"></span><br/>
+      &#x2198;<code id="downloadSpeed">0 b/s</code>
+      / &#x2197;<code id="uploadSpeed">0 b/s</code>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="app.js"></script>
+</body>
+</html>

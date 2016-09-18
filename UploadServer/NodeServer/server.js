@@ -7,10 +7,12 @@ var fs = require('fs');
 
 //for HTTPS
 
-https.createServer({
+var server = https.createServer({
       key: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/privkey.pem'),
       cert: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/fullchain.pem')
     }, app).listen(5000);
+
+var io = require('socket.io')(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -70,3 +72,24 @@ app.post('/upload', function(req, res){
 
 });
 
+var torrentsList = [];
+
+//replace __dirname with the torrents folder
+var path = '/usr/local/nginx/html/torrents';
+
+
+fs.readdir(path, function(err, items){
+  console.log(items);
+  items.forEach(function(item){
+  	torrentsList.push(item);
+    console.log(item);
+  });
+});
+
+
+io.on('connection', function(socket){
+  socket.emit('torrents', torrentsList);
+  socket.on('new torrent', function(data){
+    console.log(data);
+  });
+});

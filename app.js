@@ -1,6 +1,30 @@
-var torrentId = 'https://elearningp2p.ml/torrents/time-drift-4k-vp9.torrent'
-
 var client = new WebTorrent()
+
+var torrentLink = 'https://elearningp2p.ml/torrents/time-drift-4k-vp9.torrent'
+var currentTorrent = torrentLink;
+
+//console.log(window.location.href);
+var currentUrl = window.location;
+var socket = io.connect('https://elearningp2p.ml:5000');
+  socket.on('torrents', function (data) {
+  console.log(data);
+  for (var i = 0; i<=data.length;i++)
+  {
+	console.log(data[i]);
+	$('#torrents').append($('<li>').append('<a href="#output" class="torrentLinks">' + currentUrl + 'torrents/' + data[i] + '</a>'));
+  };
+    //socket.emit('my other event', { my: 'data' });
+  });
+
+$(document).ready(function(){
+	console.log("Inicio");
+	$('#torrents').on('click','.torrentLinks',function(){
+		client.destroy();
+		client = new WebTorrent();
+		downloadSelectedTorrent($(this).text());
+	});
+});
+
 
 // HTML elements
 var $body = document.body
@@ -12,16 +36,20 @@ var $remaining = document.querySelector('#remaining')
 var $uploadSpeed = document.querySelector('#uploadSpeed')
 var $downloadSpeed = document.querySelector('#downloadSpeed')
 
+function downloadSelectedTorrent(torrentId){
+console.log(torrentId);
+
+currentTorrent = torrentId;
 // Download the torrent
 client.add(torrentId, function (torrent) {
 
   // Stream the file in the browser
-  torrent.files[0].appendTo('#output')
+  torrent.files[0].renderTo('#videoPlayer')
 
   // Trigger statistics refresh
-  torrent.on('done', onDone)
-  setInterval(onProgress, 500)
-  onProgress()
+  //torrent.on('done', onDone)
+  //setInterval(onProgress, 500)
+  //onProgress()
   
   // Statistics
   function onProgress () {
@@ -53,6 +81,7 @@ client.add(torrentId, function (torrent) {
     onProgress()
   }
 })
+};
 
 // Human readable bytes util
 function prettyBytes(num) {
@@ -64,3 +93,5 @@ function prettyBytes(num) {
 	unit = units[exponent]
 	return (neg ? '-' : '') + num + ' ' + unit
 }
+
+downloadSelectedTorrent(torrentLink);

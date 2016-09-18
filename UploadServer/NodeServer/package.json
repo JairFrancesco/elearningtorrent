@@ -23,6 +23,7 @@
   "homepage": "https://github.com/JairFrancesco/FileUpload-NodeJS-AJAX#readme",
   "dependencies": {
     "express": "^4.14.0",
-    "formidable": "^1.0.17"
+    "formidable": "^1.0.17",
+    "socket.io": "^1.4.8"
   }
 }

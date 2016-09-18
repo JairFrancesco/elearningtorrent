@@ -62,7 +62,7 @@ app.post('/upload', function(req, res){
     fileNames.push(filenamewext);
 
     //Cuando termine de subir el video, crear su respectivo .torrent
-    var cmd = "create-torrent --urlList 'https://elearningp2p.ml/videos/" + file.name + "' " + file.name + " > ../torrents/" + filenamewext + ".torrent";
+    var cmd = "create-torrent --urlList 'https://elearningp2p.ml/videos/" + file.name + "' '" + file.name + "' > '../torrents/" + filenamewext + ".torrent'";
     exec(cmd, {cwd:'/usr/local/nginx/html/videos'} ,function(err, stdout, stderr){
       if (err) {return console.log(err);}
       console.log(stdout);

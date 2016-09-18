@@ -2,6 +2,7 @@ var client = new WebTorrent()
 
 var torrentLink = 'https://elearningp2p.ml/torrents/time-drift-4k-vp9.torrent'
 var currentTorrent = torrentLink;
+var refreshIntervalId;
 
 //console.log(window.location.href);
 var currentUrl = window.location;
@@ -21,6 +22,7 @@ $(document).ready(function(){
 	$('#torrents').on('click','.torrentLinks',function(){
 		client.destroy();
 		client = new WebTorrent();
+		clearInterval(refreshIntervalId);
 		downloadSelectedTorrent($(this).text());
 	});
 });
@@ -47,9 +49,9 @@ function downloadSelectedTorrent(torrentId){
     torrent.files[0].renderTo('#videoPlayer')
 
     // Trigger statistics refresh
-    //torrent.on('done', onDone)
-    //setInterval(onProgress, 500)
-    //onProgress()
+    torrent.on('done', onDone)
+    refreshIntervalId = setInterval(onProgress, 500)
+    onProgress()
     
     // Statistics
     function onProgress () {

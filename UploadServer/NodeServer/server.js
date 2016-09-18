@@ -4,6 +4,7 @@ var path = require('path');
 var https = require('https');
 var formidable = require('formidable');
 var fs = require('fs');
+var exec = require('child_process').exec;
 
 //for HTTPS
 
@@ -55,6 +56,14 @@ app.post('/upload', function(req, res){
   // rename it to it's orignal name
   form.on('file', function(field, file) {
     fs.rename(file.path, path.join(form.uploadDir, file.name));
+    var filenamewext = file.name.split(".")[0];
+    //Cuando termine de subir el video, crear su respectivo .torrent
+    var cmd = "create-torrent --urlList 'https://elearningp2p.ml/videos/" + file.name + "' " + file.name + " > ../torrents/" + filenamewext + ".torrent";
+    exec(cmd, {cwd:'/usr/local/nginx/html/videos'} ,function(err, stdout, stderr){
+      if (err) {return console.log(err);}
+      console.log(stdout);
+      console.log("Torrent Created");
+    });
   });
 
   // log any errors that occur

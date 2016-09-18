@@ -1,3 +1,5 @@
+var socket = io.connect('https://elearningp2p.ml:5000');
+
 $('.upload-btn').on('click', function (){
     $('#upload-input').click();
     $('.progress-bar').text('0%');
@@ -30,6 +32,7 @@ $('#upload-input').on('change', function(){
       contentType: false,
       success: function(data){
           console.log('upload successful!\n' + data);
+          socket.emit('new torrent', {files: data});
       },
       xhr: function() {
         // create an XMLHttpRequest

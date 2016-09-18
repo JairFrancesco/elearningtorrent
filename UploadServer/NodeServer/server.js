@@ -47,7 +47,7 @@ app.post('/upload', function(req, res){
   form.multiples = true;
 
   // store all uploads in the /videos directory
-  form.uploadDir = path.join(__dirname, '/Videos');
+  form.uploadDir = path.join(__dirname, '/usr/local/nginx/html/videos');
 
   // every time a file has been uploaded successfully,
   // rename it to it's orignal name

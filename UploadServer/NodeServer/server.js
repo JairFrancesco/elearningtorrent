@@ -4,6 +4,15 @@ var path = require('path');
 var formidable = require('formidable');
 var fs = require('fs');
 
+//for HTTPS
+/*
+var privateKey = fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/privkey.pem').toString();
+var certificate = fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/fullchain.pem').toString();  
+
+// To enable HTTPS
+var app = module.exports = express.createServer({key: privateKey, cert: certificate});
+*/
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function (req, res, next) {

@@ -4,6 +4,7 @@
 	<title></title>
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="./styles.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<script type="text/javascript" src="moment.min.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
@@ -12,7 +13,10 @@
 <body>
 
 	<div id="hero">
-	<p>Lista de videos disponibles, haga click en alguno para reproducir</p>
+  <div id="info">
+    <p>Lista de videos disponibles, haga click en alguno para reproducir <a href="upload" class="btn btn-success btn-lg">Subir un Video</a></p>  
+  </div>
+  
 	<ul id="torrents"></ul>
   <div id="output">
 	<video id="videoPlayer" controls></video>

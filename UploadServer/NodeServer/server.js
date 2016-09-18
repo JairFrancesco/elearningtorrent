@@ -1,17 +1,16 @@
 var express = require('express');
 var app = express();
 var path = require('path');
+var https = require('https');
 var formidable = require('formidable');
 var fs = require('fs');
 
 //for HTTPS
-/*
-var privateKey = fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/privkey.pem').toString();
-var certificate = fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/fullchain.pem').toString();  
 
-// To enable HTTPS
-var app = module.exports = express.createServer({key: privateKey, cert: certificate});
-*/
+https.createServer({
+      key: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/privkey.pem'),
+      cert: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/fullchain.pem')
+    }, app).listen(5000);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -71,6 +70,3 @@ app.post('/upload', function(req, res){
 
 });
 
-var server = app.listen(5000, function(){
-  console.log('Server listening on port 5000');
-});

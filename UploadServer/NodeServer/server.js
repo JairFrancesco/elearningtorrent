@@ -102,6 +102,8 @@ function searchTorrents(){
   });  
 }
 
+searchTorrents();
+
 io.on('connection', function(socket){
   socket.emit('torrents', torrentsList);
   socket.on('new torrent', function(data){

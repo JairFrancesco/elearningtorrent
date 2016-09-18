@@ -1,0 +1,28 @@
+{
+  "name": "fileupload-nodejs-ajax-separate",
+  "version": "1.0.0",
+  "description": "File Uploader with Node.Js + AJAX (Separate version)",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JairFrancesco/FileUpload-NodeJS-AJAX.git"
+  },
+  "keywords": [
+    "Node",
+    "AJAX",
+    "FileUploader"
+  ],
+  "author": "Jair Francesco Huaman Canqui",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JairFrancesco/FileUpload-NodeJS-AJAX/issues"
+  },
+  "homepage": "https://github.com/JairFrancesco/FileUpload-NodeJS-AJAX#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "formidable": "^1.0.17"
+  }
+}

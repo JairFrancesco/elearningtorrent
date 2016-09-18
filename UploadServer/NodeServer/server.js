@@ -45,9 +45,11 @@ app.post('/upload', function(req, res){
 
   // create an incoming form object
   var form = new formidable.IncomingForm();
+  var fileNames = [];
 
   // specify that we want to allow the user to upload multiple files in a single request
   form.multiples = true;
+
 
   // store all uploads in the /videos directory
   //form.uploadDir = path.join(__dirname, '/videos');
@@ -57,6 +59,8 @@ app.post('/upload', function(req, res){
   form.on('file', function(field, file) {
     fs.rename(file.path, path.join(form.uploadDir, file.name));
     var filenamewext = file.name.split(".")[0];
+    fileNames.push(filenamewext);
+
     //Cuando termine de subir el video, crear su respectivo .torrent
     var cmd = "create-torrent --urlList 'https://elearningp2p.ml/videos/" + file.name + "' " + file.name + " > ../torrents/" + filenamewext + ".torrent";
     exec(cmd, {cwd:'/usr/local/nginx/html/videos'} ,function(err, stdout, stderr){
@@ -73,7 +77,8 @@ app.post('/upload', function(req, res){
 
   // once all the files have been uploaded, send a response to the client
   form.on('end', function() {
-    res.end('success');
+    //res.end('success');
+    res.end(fileNames);
   });
 
   // parse the incoming request containing the form data
@@ -84,21 +89,23 @@ app.post('/upload', function(req, res){
 var torrentsList = [];
 
 //replace __dirname with the torrents folder
-var path = '/usr/local/nginx/html/torrents';
+var torrentspath = '/usr/local/nginx/html/torrents';
 
-
-fs.readdir(path, function(err, items){
-  console.log(items);
-  items.forEach(function(item){
-  	torrentsList.push(item);
-    console.log(item);
-  });
-});
-
+function searchTorrents(){
+  torrentsList = [];
+  fs.readdir(torrentspath, function(err, items){
+    console.log(items);
+    items.forEach(function(item){
+      torrentsList.push(item);
+      console.log(item);
+    });
+  });  
+}
 
 io.on('connection', function(socket){
   socket.emit('torrents', torrentsList);
   socket.on('new torrent', function(data){
     console.log(data);
+    searchTorrents();
   });
 });

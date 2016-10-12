@@ -1,6 +1,6 @@
 var client = new WebTorrent()
 
-var torrentLink = 'https://elearningp2p.ml/torrents/time-drift-4k-vp9.torrent'
+var torrentLink = 'https://elearningp2p.ml/torrents/jair-122.torrent'
 var currentTorrent = torrentLink;
 var refreshIntervalId;
 
@@ -30,10 +30,58 @@ $(document).ready(function(){
 });
 */
 
-//Verigicar si el codec mp4 esta soportado, s(por el momento parece que si)
+ function downloadData(url, cb) {
+    console.log("Downloading " + url);
+
+    var xhr = new XMLHttpRequest;
+    xhr.open('get', url);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function () {
+        cb(new Uint8Array(xhr.response));
+    };
+    xhr.send();
+}
+
+//Verificar si el codec mp4 esta soportado, (por el momento parece que si)
 if (MediaSource.isTypeSupported('video/mp4; codecs="avc1.64001E"')) {
     console.log("mp4 codec supported");
 }
+
+var codec = 'video/mp4; codecs="avc1.64001E"'
+
+//$timeout(loadMediaSource, 500)
+function loadMediaSource(buffer) {
+  var video = document.querySelector('#videoPlayer')
+
+  window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+
+  if (!!!window.MediaSource) {
+    alert('MediaSource API is not available');
+  }
+
+  var mediaSource = new MediaSource();
+
+  video.src = window.URL.createObjectURL(mediaSource);
+
+  mediaSource.addEventListener('sourceopen', function(e) {
+    //var sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
+    var sourceBuffer = mediaSource.addSourceBuffer(codec);
+
+    sourceBuffer.addEventListener('updatestart', function(e) {
+      console.log(e);
+    }, false);
+
+
+    sourceBuffer.appendBuffer(buffer);
+    //sourceBuffer.appendBuffer(new Uint8Array(data));
+    /*(function(sb) {
+      Socket.on('media:chunk', function(data) {
+        sb.appendBuffer(new Uint8Array(data));
+      });
+    })(sourceBuffer);*/
+  }, false);
+}
+
 
 
 // HTML elements
@@ -54,7 +102,13 @@ function downloadSelectedTorrent(torrentId){
   client.add(torrentId, function (torrent) {
 
     // Stream the file in the browser
-    torrent.files[0].renderTo('#videoPlayer')
+    //torrent.files[0].renderTo('#videoPlayer')
+
+    torrent.files[0].getBuffer(function (err, buffer){
+      if (err) throw err;
+      console.log(buffer);
+      loadMediaSource(buffer);
+    });
 
     // Trigger statistics refresh
     torrent.on('done', onDone)

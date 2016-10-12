@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="./styles.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<script type="text/javascript" src="moment.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+</head>
+<body>
+
+	<div id="hero">
+  <div id="info">
+  </div>
+  
+	<ul id="torrents"></ul>
+  <div id="output">
+	<video id="videoPlayer" controls></video>
+    <div id="progressBar"></div>
+  </div>
+  <div id="status">
+    <div>
+      <span class="show-leech">Descargando </span>
+      <span class="show-seed">Seeding </span>
+      <code>
+<!--        <a id="torrentLink" href="https://elearningp2p.ml/torrents/timedrift-4k-h264.torrent">time-drift-4k-h264.torrent</a>-->
+      </code>
+      <span class="show-leech"> from </span>
+      <span class="show-seed"> to </span>
+      <code id="numPeers">0 peers</code>. 
+    </div>
+    <div>
+      <code id="downloaded"></code>
+      of <code id="total"></code>
+      	— <span id="remaining"></span><br/>
+      &#x2198;<code id="downloadSpeed">0 b/s</code>
+      / &#x2197;<code id="uploadSpeed">0 b/s</code>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="app.js"></script>
+</body>
+</html>

@@ -72,7 +72,7 @@ function loadMediaSource(buffer) {
     }, false);
 
 
-    sourceBuffer.appendBuffer(buffer);
+    sourceBuffer.appendBuffer(new Uint8Array(buffer));
     //sourceBuffer.appendBuffer(new Uint8Array(data));
     /*(function(sb) {
       Socket.on('media:chunk', function(data) {

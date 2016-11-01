@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="css/main.css">
 
   <!-- Include the latest version of WebTorrent -->
-  <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js">
-
+  <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="js/vendor/modernizr-2.6.2.min.js"></script>
   <style>
     fieldset {
@@ -200,8 +200,7 @@
     var socket = io.connect('https://elearningp2p.ml:7000');
     socket.on('play-stream', function (data) {
       console.log(data);
-      torrentId = data;
-      var torrentId = torrentLink.value;      
+      var torrentId = data;
       if (torrentId=="")
       {
         return;

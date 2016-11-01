@@ -77,7 +77,7 @@ watcher.on('delete', function(file) {
 
 //Cuando un usuario se conecta, mandarle el ultimo torrent generado.
 io.on('connection', function(socket){
-  socket.emit('chunk', lastTorrent);
+  socket.emit('play-stream', lastTorrent);
   /*socket.on('new torrent', function(data){
     console.log(data);
     searchTorrents();

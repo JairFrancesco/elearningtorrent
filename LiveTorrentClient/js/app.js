@@ -1,4 +1,8 @@
 'use strict';
+
+var socket = io.connect('https://elearningp2p.ml:7000');
+var cola = new Queue();
+
 var
   $ = document.querySelector.bind(document),
   inputs = $('#inputs'),
@@ -108,8 +112,6 @@ prepareSourceBuffer = function(combined, outputType, callback) {
   });
 };
 
-var cola = new Queue();
-
 function playChunk(torrentId)
 {
   var client = new WebTorrent();
@@ -184,8 +186,6 @@ function playChunk(torrentId)
   });
 }
 
-
-var socket = io.connect('https://elearningp2p.ml:7000');
 socket.on('chunk', function (data) {
   console.log(data);
   cola.enqueue(data) //Encolar el .torrent recibido
@@ -196,6 +196,9 @@ socket.on('chunk', function (data) {
   }
 });
 
+socket.on('play-stream', function(data){
+  playChunk(data);
+});
 
 $('#combined-output').addEventListener('change', function () {
     Array.prototype.slice.call(document.querySelectorAll('[name="output"'))

@@ -1,0 +1,22 @@
+{
+  "name": "livetorrentserver",
+  "version": "1.0.0",
+  "description": "Server for livetorrent",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "hound": "^1.0.4",
+    "socket.io": "^1.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "livetorrent",
+    "server",
+    "webtorrent"
+  ],
+  "author": "Jair Francesco Huaman Canqui",
+  "license": "ISC"
+}

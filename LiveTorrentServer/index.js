@@ -57,7 +57,7 @@ watcher.on('create', function(file, stats) {
   var beforeCompleteChunkName = streamName + '-' + (parseInt(chunkNumber) - 1).toString();
   var beforeCompleteChunk = beforeCompleteChunkName + '.ts';
 
-  var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
+  var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' --pieceLength 100000" + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
   exec(cmd, {cwd:'/HLS/live/'} ,function(err, stdout, stderr){
     if (err) {return console.log(err);}
     lastTorrent = URL_CHUNKS + beforeCompleteChunkName + ".torrent";

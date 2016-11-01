@@ -61,7 +61,7 @@ watcher.on('create', function(file, stats) {
   exec(cmd, {cwd:'/HLS/live/'} ,function(err, stdout, stderr){
     if (err) {return console.log(err);}
     lastTorrent = URL_CHUNKS + beforeCompleteChunkName + ".torrent";
-    io.emit('new-chunk', lastTorrent);
+    io.emit('chunk', lastTorrent);
     console.log(stdout);
   });
 
@@ -77,7 +77,7 @@ watcher.on('delete', function(file) {
 
 //Cuando un usuario se conecta, mandarle el ultimo torrent generado.
 io.on('connection', function(socket){
-  socket.emit('play-stream', lastTorrent);
+  socket.emit('chunk', lastTorrent);
   /*socket.on('new torrent', function(data){
     console.log(data);
     searchTorrents();

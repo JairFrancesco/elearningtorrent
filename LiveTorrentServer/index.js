@@ -60,7 +60,8 @@ watcher.on('create', function(file, stats) {
   var beforeCompleteChunk = beforeCompleteChunkName + '.ts';
   var pieceLengthBytes = calculatePieceLength(TS_CHUNKS_DIRECTORY + "/" + beforeCompleteChunk);
 
-  var cmd = "create-torrent --pieceLength " + pieceLengthBytes.toString() + " --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
+  //var cmd = "create-torrent --pieceLength " + pieceLengthBytes.toString() + " --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
+  var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
   exec(cmd, {cwd:'/HLS/live/'} ,function(err, stdout, stderr){
     if (err) {return console.log(err);}
     lastTorrent = URL_CHUNKS + beforeCompleteChunkName + ".torrent";

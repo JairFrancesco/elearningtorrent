@@ -112,8 +112,9 @@ prepareSourceBuffer = function(combined, outputType, callback) {
   });
 };
 
-function appendStream(buffer)
+function appendStream(err, buffer)
 {
+  var transmuxer;
   if (err) throw err;
   console.log(buffer);
   var segment = new Uint8Array(buffer),
@@ -180,7 +181,7 @@ function playChunk(torrentId)
     var file = torrent.files[0]
     file.getBuffer(function(err, buffer){
       var nextTorrent = cola.dequeue();
-      appendStream(nextTorrent);
+      appendStream(err, nextTorrent);
     });
     //muxedName = this.files[0].name.replace('.ts', '.f4m');
   });

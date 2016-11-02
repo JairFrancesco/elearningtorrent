@@ -15,6 +15,8 @@ var PORT = 7000;
 var TS_CHUNKS_DIRECTORY = '/HLS/live';
 var URL_CHUNKS = 'https://elearningp2p.ml:4430/live/';
 var lastTorrent;
+var idealPieceLenghKB = 400;
+var peersOnline = 0;
 
 var server = https.createServer({
       key: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/privkey.pem'),
@@ -77,13 +79,31 @@ watcher.on('delete', function(file) {
 
 //Cuando un usuario se conecta, mandarle el ultimo torrent generado.
 io.on('connection', function(socket){
+  console.log("Peers Online: ", peersOnline);
   socket.emit('play-stream', lastTorrent);
   /*socket.on('new torrent', function(data){
     console.log(data);
     searchTorrents();
   });
   */
+  socket.on('disconnect', function(){
+    peersOnline--;
+    console.log("Peers Online: ", peersOnline);
+  });
 });
 
 //Cada vez que se crea un torrent mandarlo a los clientes para que estos lo reproduzcan
 
+//Useful functions
+function getFilesizeInBytes(filename) {
+ var stats = fs.statSync(filename)
+ var fileSizeInBytes = stats["size"]
+ return fileSizeInBytes
+}
+
+function calculatePieceLength(filename)
+{
+  var fileSizeKB = getFilesizeInBytes(filename)/1000.0;
+  var tmpPieceLength = fileSizeKB / (peersOnline - 5);
+  var minimumIdealPeers = fileSizeKB / idealPieceLenghKB;
+}

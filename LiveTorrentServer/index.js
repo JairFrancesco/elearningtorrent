@@ -15,7 +15,7 @@ var PORT = 7000;
 var TS_CHUNKS_DIRECTORY = '/HLS/live';
 var URL_CHUNKS = 'https://elearningp2p.ml:4430/live/';
 var lastTorrent;
-var idealPieceLenghKB = 400;
+var idealPieceLengh = 400000;
 var peersOnline = 0;
 
 var server = https.createServer({
@@ -58,8 +58,9 @@ watcher.on('create', function(file, stats) {
   var chunkNumber = tmpStreamNumber[1];
   var beforeCompleteChunkName = streamName + '-' + (parseInt(chunkNumber) - 1).toString();
   var beforeCompleteChunk = beforeCompleteChunkName + '.ts';
+  var pieceLengthBytes = calculatePieceLength(TS_CHUNKS_DIRECTORY + "/" + beforeCompleteChunk);
 
-  var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' --pieceLength 100000" + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
+  var cmd = "create-torrent --pieceLength " + pieceLengthBytes.toString() + " --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
   exec(cmd, {cwd:'/HLS/live/'} ,function(err, stdout, stderr){
     if (err) {return console.log(err);}
     lastTorrent = URL_CHUNKS + beforeCompleteChunkName + ".torrent";
@@ -79,6 +80,7 @@ watcher.on('delete', function(file) {
 
 //Cuando un usuario se conecta, mandarle el ultimo torrent generado.
 io.on('connection', function(socket){
+  peersOnline++;
   console.log("Peers Online: ", peersOnline);
   socket.emit('play-stream', lastTorrent);
   /*socket.on('new torrent', function(data){
@@ -103,7 +105,19 @@ function getFilesizeInBytes(filename) {
 
 function calculatePieceLength(filename)
 {
-  var fileSizeKB = getFilesizeInBytes(filename)/1000.0;
-  var tmpPieceLength = fileSizeKB / (peersOnline - 5);
-  var minimumIdealPeers = fileSizeKB / idealPieceLenghKB;
+  var fileSize = getFilesizeInBytes(filename);
+  var minimumIdealPeers = fileSize / idealPieceLengh;
+
+  if (peersOnline-5 == 0)
+  {
+    return idealPieceLengh;
+  }
+  else if (peersOnline<minimumIdealPeers)
+  {
+    return idealPieceLengh
+  }
+  else
+  {
+    return file/(peersOnline-5);  
+  }
 }

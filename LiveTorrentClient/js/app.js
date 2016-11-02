@@ -8,13 +8,8 @@ var
   inputs = $('#inputs'),
   streamButton = $('#Stream'),
   torrentLink = $('#torrentLink'),
-  vjsParsed,
-  vjsBytes,
   saveConfig,
-  restoreConfig,
-  muxedData,
-  muxedName,
-  transmuxer,
+  restoreConfig,  
   video,
   mediaSource,
   logevent,
@@ -115,6 +110,7 @@ prepareSourceBuffer = function(combined, outputType, callback) {
 function appendStream(err, buffer, cb)
 {
   var transmuxer;
+  var muxedData;
   if (err) throw err;
   console.log(buffer);
   var segment = new Uint8Array(buffer),
@@ -162,7 +158,6 @@ function appendStream(err, buffer, cb)
       muxedData = bytes;
       remuxedSegments = [];
       remuxedBytesLength = 0;
-      vjsBytes = bytes;
       prepareSourceBuffer(combined, outputType, function () {
         console.log('appending...');
         window.vjsBuffer.appendBuffer(bytes);
@@ -191,13 +186,13 @@ function playChunk(torrentId)
 }
 
 socket.on('chunk', function (data) {
-  console.log(data);
-  cola.enqueue(data) //Encolar el .torrent recibido
   var torrentId = data;
   if (torrentId=="")
   {
     return; 
   }
+  console.log(data);
+  cola.enqueue(data) //Encolar el .torrent recibido
 });
 
 socket.on('play-stream', function(data){

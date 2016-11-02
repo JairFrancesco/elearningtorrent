@@ -72,7 +72,7 @@ watcher.on('create', function(file, stats) {
 
 })
 watcher.on('change', function(file, stats) {
-  console.log(file + ' was changed')
+  //console.log(file + ' was changed')
 })
 watcher.on('delete', function(file) {
   console.log(file + ' was deleted')

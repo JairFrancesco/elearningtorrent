@@ -112,75 +112,75 @@ prepareSourceBuffer = function(combined, outputType, callback) {
   });
 };
 
+function appendStream(buffer)
+{
+  if (err) throw err;
+  console.log(buffer);
+  var segment = new Uint8Array(buffer),
+      combined = document.querySelector('#combined-output').checked,
+      outputType = document.querySelector('input[name="output"]:checked').value,
+      resetTransmuxer = false,//$('#reset-tranmsuxer').checked,
+      remuxedSegments = [],
+      remuxedInitSegment = null,
+      remuxedBytesLength = 0,
+      createInitSegment = false,
+      bytes,
+      i, j;
+  if (resetTransmuxer || !transmuxer) {
+    createInitSegment = true;
+    if (combined) {
+        outputType = 'combined';
+        transmuxer = new muxjs.mp4.Transmuxer();
+    } else {
+        transmuxer = new muxjs.mp4.Transmuxer({remux: false});
+    }
+
+    transmuxer.on('data', function(event) {
+      if (event.type === outputType) {
+        remuxedSegments.push(event);
+        remuxedBytesLength += event.data.byteLength;
+        remuxedInitSegment = event.initSegment;
+      }
+    });
+
+    transmuxer.on('done', function () {
+      var offset = 0;
+      if (createInitSegment) {
+        bytes = new Uint8Array(remuxedInitSegment.byteLength + remuxedBytesLength)
+        bytes.set(remuxedInitSegment, offset);
+        offset += remuxedInitSegment.byteLength;
+        createInitSegment = false;
+      } else {
+        bytes = new Uint8Array(remuxedBytesLength);
+      }
+
+      for (j = 0, i = offset; j < remuxedSegments.length; j++) {
+        bytes.set(remuxedSegments[j].data, i);
+        i += remuxedSegments[j].byteLength;
+      }
+      muxedData = bytes;
+      remuxedSegments = [];
+      remuxedBytesLength = 0;
+      vjsBytes = bytes;
+      prepareSourceBuffer(combined, outputType, function () {
+        console.log('appending...');
+        window.vjsBuffer.appendBuffer(bytes);
+        video.play();
+      });
+    });
+  }
+  transmuxer.push(segment);
+  transmuxer.flush();
+}
+
 function playChunk(torrentId)
 {
   var client = new WebTorrent();
   client.add(torrentId, function (torrent) {
     var file = torrent.files[0]
     file.getBuffer(function(err, buffer){
-      playChunk(cola.dequeue());
-      if (err) throw err;
-      console.log(buffer);
-      //cb(new Uint8Array(buffer)); //callback;
-      var segment = new Uint8Array(buffer),
-          combined = document.querySelector('#combined-output').checked,
-          outputType = document.querySelector('input[name="output"]:checked').value,
-          resetTransmuxer = false,//$('#reset-tranmsuxer').checked,
-          remuxedSegments = [],
-          remuxedInitSegment = null,
-          remuxedBytesLength = 0,
-          createInitSegment = false,
-          bytes,
-          i, j;
-      if (resetTransmuxer || !transmuxer) {
-        createInitSegment = true;
-        if (combined) {
-            outputType = 'combined';
-            transmuxer = new muxjs.mp4.Transmuxer();
-        } else {
-            transmuxer = new muxjs.mp4.Transmuxer({remux: false});
-        }
-
-        transmuxer.on('data', function(event) {
-          if (event.type === outputType) {
-            remuxedSegments.push(event);
-            remuxedBytesLength += event.data.byteLength;
-            remuxedInitSegment = event.initSegment;
-          }
-        });
-
-        transmuxer.on('done', function () {
-          var offset = 0;
-          if (createInitSegment) {
-            bytes = new Uint8Array(remuxedInitSegment.byteLength + remuxedBytesLength)
-            bytes.set(remuxedInitSegment, offset);
-            offset += remuxedInitSegment.byteLength;
-            createInitSegment = false;
-          } else {
-            bytes = new Uint8Array(remuxedBytesLength);
-          }
-
-          for (j = 0, i = offset; j < remuxedSegments.length; j++) {
-            bytes.set(remuxedSegments[j].data, i);
-            i += remuxedSegments[j].byteLength;
-          }
-          muxedData = bytes;
-          remuxedSegments = [];
-          remuxedBytesLength = 0;
-
-          vjsBytes = bytes;
-          vjsParsed = muxjs.mp4.tools.inspect(bytes);
-          console.log('transmuxed', vjsParsed);
-
-          prepareSourceBuffer(combined, outputType, function () {
-            console.log('appending...');
-            window.vjsBuffer.appendBuffer(bytes);
-            video.play();
-          });
-        });
-      }
-      transmuxer.push(segment);
-      transmuxer.flush();
+      var nextTorrent = cola.dequeue();
+      appendStream(nextTorrent);
     });
     //muxedName = this.files[0].name.replace('.ts', '.f4m');
   });

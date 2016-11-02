@@ -112,7 +112,7 @@ prepareSourceBuffer = function(combined, outputType, callback) {
   });
 };
 
-function appendStream(err, buffer)
+function appendStream(err, buffer, cb)
 {
   var transmuxer;
   if (err) throw err;
@@ -167,6 +167,8 @@ function appendStream(err, buffer)
         console.log('appending...');
         window.vjsBuffer.appendBuffer(bytes);
         video.play();
+        var nextTorrent = cola.dequeue();
+        cb(nextTorrent);
       });
     });
   }
@@ -178,10 +180,11 @@ function playChunk(torrentId)
 {
   var client = new WebTorrent();
   client.add(torrentId, function (torrent) {
-    var file = torrent.files[0]
+    var file = torrent.files[0];
     file.getBuffer(function(err, buffer){
-      var nextTorrent = cola.dequeue();
-      appendStream(err, nextTorrent);
+      appendStream(err, buffer, function(newTorrent){
+        playChunk(newTorrent);
+      });
     });
     //muxedName = this.files[0].name.replace('.ts', '.f4m');
   });

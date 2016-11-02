@@ -12,10 +12,10 @@ var exec = require('child_process').exec;
 //General Variables
 
 var PORT = 7000;
-var TS_CHUNKS_DIRECTORY = '/HLS/live';
-var URL_CHUNKS = 'https://elearningp2p.ml:4430/live/';
+var TS_CHUNKS_DIRECTORY = '/var/www/html/HLS/live'; //Directory in apache2
+var URL_CHUNKS = 'https://elearningp2p.ml/HLS/live/';
 var lastTorrent;
-var idealPieceLengh = 400000;
+var idealPieceLenght = 400000;
 var peersOnline = 0;
 
 var server = https.createServer({
@@ -60,9 +60,9 @@ watcher.on('create', function(file, stats) {
   var beforeCompleteChunk = beforeCompleteChunkName + '.ts';
   var pieceLengthBytes = calculatePieceLength(TS_CHUNKS_DIRECTORY + "/" + beforeCompleteChunk);
 
-  //var cmd = "create-torrent --pieceLength " + pieceLengthBytes.toString() + " --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
-  var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
-  exec(cmd, {cwd:'/HLS/live/'} ,function(err, stdout, stderr){
+  var cmd = "create-torrent --pieceLength " + pieceLengthBytes.toString() + " --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
+  //var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
+  exec(cmd, {cwd:TS_CHUNKS_DIRECTORY} ,function(err, stdout, stderr){
     if (err) {return console.log(err);}
     lastTorrent = URL_CHUNKS + beforeCompleteChunkName + ".torrent";
     io.emit('chunk', lastTorrent);
@@ -106,19 +106,35 @@ function getFilesizeInBytes(filename) {
 
 function calculatePieceLength(filename)
 {
-  var fileSize = getFilesizeInBytes(filename);
-  var minimumIdealPeers = fileSize / idealPieceLengh;
-
-  if (peersOnline-5 == 0)
+  if (!fileExists(filename))
   {
-    return idealPieceLengh;
+	return idealPieceLenght;
+  }
+  var fileSize = getFilesizeInBytes(filename);
+  var minimumIdealPeers = fileSize / idealPieceLenght;
+
+  if (peersOnline-5 <= 0)
+  {
+    return idealPieceLenght;
   }
   else if (peersOnline<minimumIdealPeers)
   {
-    return idealPieceLengh
+    return idealPieceLenght;
   }
   else
   {
-    return file/(peersOnline-5);  
+    return fileSize/(peersOnline-5);  
   }
+}
+
+function fileExists(filePath)
+{
+    try
+    {
+        return fs.statSync(filePath).isFile();
+    }
+    catch (err)
+    {
+        return false;
+    }
 }

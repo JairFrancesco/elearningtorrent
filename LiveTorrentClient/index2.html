@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="stylesheet" href="css/normalize.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.plyr.io/2.0.7/plyr.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.plyr.io/2.0.7/demo.css">
+
+  <!-- Include the latest version of WebTorrent -->
+  <script src="webtorrent.min.js"></script>
+  <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+  <script src="js/Queue.js"></script>
+  <script type="text/javascript" src="https://cdn.plyr.io/2.0.7/plyr.js"></script>
+
+  <style>
+    fieldset {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    /* This is purely for the demo */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .plyr {
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <video poster="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg" controls crossorigin>
+    <!-- Video files -->
+    <source src="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
+    <source src="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.webm" type="video/webm">
+    <!-- Text track file -->
+    <track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.en.vtt" default>
+
+    <!-- Fallback for browsers that don't support the <video> element -->
+    <a href="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4" download>Download</a>
+  </video>
+  
+  <div class="actions">
+    <button type="button" class="btn js-play">Play</button>
+    <button type="button" class="btn js-pause">Pause</button>
+    <button type="button" class="btn js-stop">Stop</button>
+    <button type="button" class="btn js-rewind">Rewind</button>
+    <button type="button" class="btn js-forward">Forward</button>
+  </div>
+</div>
+
+  <div class="header-container">
+    <header class="wrapper clearfix">
+      <h1 class="title">Stream .ts file on html5 video tag</h1>
+    </header>
+  </div>
+
+  <div class="main-container">
+    <div class="main wrapper clearfix">
+
+      <article>
+        <header>
+          <p>
+        </header>
+        <section>
+          <h2>Entrada</h2>
+          <form id="inputs">
+            <fieldset>
+              <legend>M2TS Input</legend>
+              <div>
+                <label>
+                  Your .torrent link of .TS or AAC Segment
+                  <input type="text" id="torrentLink" placeholder="Torrent link">
+                  <button type="button" id="Stream">Stream</button>
+                  <!--<input type="file" id="original">-->
+                </label>
+              </div>
+              <div>
+                <label><input id="combined-output" type=checkbox name=combined checked value="combined">&nbsp;Remux output into a single output?
+                </label>
+              </div>
+              <div>
+                Otherwise, output only:&nbsp;
+                <label><input id="video-output" type=radio name=output disabled checked value="video">&nbsp;Video
+                </label>
+                <label><input id="audio-output" type=radio name=output disabled checked value="audio">&nbsp;Audio
+                </label>
+              </div>
+              <div>
+                <label><input id="reset-tranmsuxer" type=checkbox name=reset checked value="reset">&nbsp;Recreate the Transmuxer &amp; MediaSource for each file open?
+                </label>
+              </div>
+            </fieldset>
+            <div>
+              <label>
+                Codecs:
+                <input id="codecs" type="text" value="avc1.64001f,mp4a.40.5">
+              </label>
+            </div>
+          </form>
+        </section>
+      </article>
+
+
+
+
+    </div> <!-- #main -->
+  </div> <!-- #main-container -->
+
+  <div class="footer-container">
+    <footer class="wrapper">
+      <h3>Make with &hearts; and WebTorrent by <a href="https://github.com/JairFrancesco">Jair Francesco</a></h3>
+    </footer>
+  </div>
+
+  <script src="js/mux.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

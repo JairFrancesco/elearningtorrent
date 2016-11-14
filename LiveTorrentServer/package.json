@@ -4,9 +4,14 @@
   "description": "Server for livetorrent",
   "main": "index.js",
   "dependencies": {
+    "bufferutil": "^1.2.1",
+    "chokidar": "^1.6.1",
+    "create-torrent": "^3.25.1",
     "express": "^4.14.0",
     "hound": "^1.0.4",
-    "socket.io": "^1.5.1"
+    "socket.io": "^1.5.1",
+    "utf-8-validate": "^1.2.1",
+    "ws": "^1.1.1"
   },
   "devDependencies": {},
   "scripts": {

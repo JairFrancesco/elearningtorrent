@@ -1,0 +1,32 @@
+var Client  = require(./client.js)
+
+function Stream(name)
+{
+	this.counterId = 0;
+	this.streamName = name;
+	this.torrentFile = "";
+	this.clients = {};
+}
+
+Stream.prototype.addClient = function(client){
+	client.id = counterId;
+	clients.push(client)
+};
+
+Stream.prototype.getClientById(id)
+{
+	var i;
+	for (i = 0; i < clients.length; i++)
+	{
+		if (clients[i].id == id){
+			return clients[i];
+		}
+	}
+}
+
+
+Stream.prototype.deleteClient = function(client){
+	clients.delete[client.id];
+};
+
+module.exports = Client;

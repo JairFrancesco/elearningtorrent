@@ -1,101 +1,124 @@
 //Require necessary modules.
 
-var http = require("http");
-var hound = require('hound');
+var chokidar = require('chokidar');
 var express = require('express');
 var app = express();
 var path = require('path');
 var https = require('https');
 var fs = require('fs');
 var exec = require('child_process').exec;
+//var Stream = require('./stream');
 
-//General Variables
+/**
+ * Global variables
+ */
 
 var PORT = 7000;
+var webSocketsServerPort = 1337;
 var TS_CHUNKS_DIRECTORY = '/var/www/html/HLS/live'; //Directory in apache2
-var URL_CHUNKS = 'https://elearningp2p.ml/HLS/live/';
-var lastTorrent;
+var URL_CHUNKS = 'http://elearningp2p.ml/HLS/live/';
+var lastTorrent = "";
 var idealPieceLenght = 400000;
 var peersOnline = 0;
+var users = {};
+var liveStreams = {};
 
-var server = https.createServer({
-      key: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/privkey.pem'),
-      cert: fs.readFileSync('/etc/letsencrypt/live/elearningp2p.ml/fullchain.pem')
-    }, app).listen(PORT);
 
-var io = require('socket.io')(server);
+var WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({ port: webSocketsServerPort });
+ 
+wss.on('connection', function connection(ws) {
+  console.log('User connected');
+  ws.on('message', function incoming(message) {
+    var data;
+    try {
+         data = JSON.parse(message); 
+    } catch (e) { 
+         console.log("Invalid JSON"); 
+         data = {}; 
+    } 
+    console.log("Message received", message);
+  }); 
+  //ws.send('something');
+  sendTo(ws, {type:'play', torrent: lastTorrent });
 
-app.use(express.static(path.join(__dirname, 'public')));
+  ws.on("close", function() { 
+    console.log('User disconnected');
 
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
+  });
 });
 
-app.get('/', function(req, res){
-  res.send("Server For Live Streaming using webtorrent");
+function sendTo(connection, message) { 
+   connection.send(JSON.stringify(message)); 
+}
+
+
+function broadcast(message) {
+    wss.clients.forEach(function each(client) {
+            client.send(JSON.stringify(message));
+    });
+}
+
+var watcher = chokidar.watch(TS_CHUNKS_DIRECTORY, {
+  ignored: '*.m3u8'|'*.torrent', persistent: true
 });
 
-console.log('Server running at http://127.0.0.1:'+PORT);
+var log = console.log.bind(console);
 
-// Create a directory tree watcher.
-watcher = hound.watch(TS_CHUNKS_DIRECTORY)
-
-//Create the torrents
-watcher.on('create', function(file, stats) {
-  console.log(file + ' was created')
+watcher
+  .on('add', function(path) {
+	 log('File', path, 'has been added'); 
+	 //console.log(file + ' was created')
+  var file = path;
   var tmp = file.split("/");
   var filename = tmp[tmp.length-1];
-  console.log("Nombre del archivo: " + filename);
+  //console.log("Nombre del archivo: " + filename);
   var filenameWithoutExt = filename.split(".")[0];
-  console.log("Sin extension:" + filenameWithoutExt);
+  //console.log("Sin extension:" + filenameWithoutExt);
 
   var tmpStreamNumber = filenameWithoutExt.split('-');
   var streamName = tmpStreamNumber[0];
   var chunkNumber = tmpStreamNumber[1];
   var beforeCompleteChunkName = streamName + '-' + (parseInt(chunkNumber) - 1).toString();
   var beforeCompleteChunk = beforeCompleteChunkName + '.ts';
-  var pieceLengthBytes = calculatePieceLength(TS_CHUNKS_DIRECTORY + "/" + beforeCompleteChunk);
+  //var pieceLengthBytes = calculatePieceLength(TS_CHUNKS_DIRECTORY + "/" + beforeCompleteChunk);
+  var pieceLengthBytes = 400000;
 
   var cmd = "create-torrent --pieceLength " + pieceLengthBytes.toString() + " --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
   //var cmd = "create-torrent --urlList '" + URL_CHUNKS + beforeCompleteChunk + "' " + beforeCompleteChunk  + ' > ' + beforeCompleteChunkName + ".torrent";
   exec(cmd, {cwd:TS_CHUNKS_DIRECTORY} ,function(err, stdout, stderr){
     if (err) {return console.log(err);}
     lastTorrent = URL_CHUNKS + beforeCompleteChunkName + ".torrent";
-    io.emit('chunk', lastTorrent);
+    broadcast({type: 'chunk', torrent: lastTorrent});
+
     console.log(stdout);
   });
+	})
+  .on('unlink', function(path) {
+	try {
+	 var file = path;
+	 log('File', path, 'has been removed'); 
+	 var tmp = file.split("/");
+	 var filename = tmp[tmp.length-1];
+	 var filenameWithoutExt = filename.split(".")[0];
+	 tmp.splice(tmp.length-1, 1);
+	 var filePath = tmp.join("/");
+	 //fs.unlink(filePath + "/" + filenameWithoutExt + '.torrent', (err) => {
+          //if (err) return console.log(err);
+          //console.log('successfully deleted .torrent');
+	  //Si fue eliminado exitosamente, entonces enviar a los clientes para eliminar las conexiones.
+	  broadcast({type: 'remove-torrent', torrent: URL_CHUNKS + filenameWithoutExt + '.torrent'});
+	 //});
+	} catch (err){
+		console.log("Error eliminando archivo torrent");
+	}
+
+  })
+  .on('unlinkDir', function(path) { log('Directory', path, 'has been removed'); })
+  .on('error', function(error) { log('Error happened', error); })
+  .on('ready', function() { log('Initial scan complete. Ready for changes.'); })
 
 
-})
-watcher.on('change', function(file, stats) {
-  //console.log(file + ' was changed')
-})
-watcher.on('delete', function(file) {
-  console.log(file + ' was deleted')
-})
-
-
-//Cuando un usuario se conecta, mandarle el ultimo torrent generado.
-io.on('connection', function(socket){
-  peersOnline++;
-  console.log("Peers Online: ", peersOnline);
-  socket.emit('play-stream', lastTorrent);
-  /*socket.on('new torrent', function(data){
-    console.log(data);
-    searchTorrents();
-  });
-  */
-  socket.on('disconnect', function(){
-    peersOnline--;
-    console.log("Peers Online: ", peersOnline);
-  });
-});
-
-//Cada vez que se crea un torrent mandarlo a los clientes para que estos lo reproduzcan
 
 //Useful functions
 function getFilesizeInBytes(filename) {

@@ -10,10 +10,13 @@
   <link rel="stylesheet" href="css/main.css">
 
   <!-- Include the latest version of WebTorrent -->
-  <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
-  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="webtorrent.min.js"></script>
+<!--<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>-->
   <script src="js/vendor/modernizr-2.6.2.min.js"></script>
   <script src="js/Queue.js"></script>
+	
+  <!--Video.js-->
+<!--  <link href="http://vjs.zencdn.net/5.12.6/video-js.css" rel="stylesheet">-->
   <style>
     fieldset {
       padding: 10px;
@@ -23,6 +26,23 @@
 </head>
 <body>
 
+<video id="my-video_html5_api" controls preload="auto" width="640" height="264">
+    <p>
+      To view this video please enable JavaScript, and consider upgrading to a web browser that
+      <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+    </p>
+</video>
+
+      <div id="video-container">
+        <video controls
+          id="video"
+          class="video-js"
+          <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+          </p>
+        </video>
+      </div>
   <div class="header-container">
     <header class="wrapper clearfix">
       <h1 class="title">Stream .ts file on html5 video tag</h1>
@@ -73,9 +93,10 @@
             </div>
           </form>
         </section>
-        <section id="video-place">
-        </section>
       </article>
+
+
+
 
     </div> <!-- #main -->
   </div> <!-- #main-container -->
@@ -86,7 +107,8 @@
     </footer>
   </div>
 
-
+<!--<script src="http://vjs.zencdn.net/5.12.6/video.js"></script>-->
+<!--<script src="https://github.com/videojs/videojs-contrib-media-sources/releases/download/v4.0.5/videojs-contrib-media-sources.js"></script>-->
   <script src="js/mux.js"></script>
   <script src="js/app.js"></script>
 </body>
